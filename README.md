@@ -7,8 +7,8 @@ Hướng dẫn triển khai dự án JetAuto Pro gồm hai phần: chạy mô ph
 ## Yêu cầu
 
 - Môi trường ROS 2 và các package phụ thuộc đã được cài đặt, build thành công.
-- Với mô phỏng: máy tính đã cài các thành phần mô phỏng và Navigation cần thiết của dự án.
-- Với robot thật: JetAuto Pro đã khởi động, kết nối với máy thực thi lệnh; camera, servo và các phần cứng liên quan đã được kết nối, cấu hình.
+- Với mô phỏng: máy tính đã cài các file urdf, mesh, plugin, SLAM và Navigation cần thiết của dự án.
+- Với robot thật: JetAuto Pro đã khởi động, kết nối với máy thực thi lệnh; camera, servo và các phần cứng liên quan đã được bật.
 - Source môi trường ROS 2 và workspace tương ứng trước khi chạy các lệnh.
 
 Ví dụ, nếu sử dụng workspace `~/jetauto_simulation` trên PC:
@@ -38,12 +38,11 @@ source ~/jetauto_simulation/install/setup.bash
 Chỉ cần chạy launch Nav2 của dự án:
 
 ```bash
-ros2 launch jetauto_simulation nav2.launch
+ros2 launch jetauto_simulation nav2_launch.xml
 ```
 
 Sau khi khởi động, quan sát robot trong môi trường mô phỏng và kiểm tra các thành phần Navigation theo giao diện/cấu hình của dự án.
 
-> **Lưu ý về tên file:** Lệnh trên sử dụng đúng tên `nav2.launch` theo hướng dẫn dự án. Nếu trên máy file được đặt tên khác (ví dụ `nav2_launch.xml`), phải dùng đúng tên file hiện có trong package. Có thể kiểm tra bằng `ls ~/jetauto_simulation/src/jetauto_simulation/launch/`.
 
 ---
 
@@ -122,8 +121,6 @@ jetauto_simulation/
 - `worlds/`: môi trường mô phỏng.
 - `map/`, `params/`: bản đồ và cấu hình.
 - `transport_navigation/`: thành phần liên quan đến nhiệm vụ vận chuyển trong dự án.
-
-**Lưu ý:** Các package dùng trên robot thật như `peripherals`, `servo_controller` và `example` không nhất thiết nằm trong repository mô phỏng này; chúng phải được cài đặt trên hệ thống chạy thật.
 
 ---
 
