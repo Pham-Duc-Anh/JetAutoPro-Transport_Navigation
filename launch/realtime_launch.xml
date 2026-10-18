@@ -1,0 +1,29 @@
+<launch>
+    <node pkg="robot_state_publisher" 
+          exec="robot_state_publisher" 
+          name="robot_state_publisher"
+          output="screen">
+        <param name="use_sim_time" value="false" />
+        <!-- Đã nhúng thẳng đường dẫn vào lệnh command, bỏ qua việc tạo biến để tránh bug của ROS 2 -->
+        <param name="robot_description" 
+               value="$(command 'env need_compile=True MACHINE_TYPE=JetAutoPro LIDAR_TYPE=A1 DEPTH_CAMERA_TYPE=AstraPro xacro $(find-pkg-share jetauto_simulation)/urdf/jetauto.xacro')" />
+    </node>
+
+    <node pkg="slam_toolbox" 
+          exec="async_slam_toolbox_node" 
+          name="slam_toolbox" 
+          output="screen">
+        <param name="use_sim_time" value="false" />
+        <!-- Nạp file cấu hình thông số cho SLAM -->
+        <param from="$(find-pkg-share jetauto_simulation)/params/slam_toolbox_params.yaml" />
+    </node>
+
+    <node pkg="rviz2"
+          exec="rviz2"
+          name="rviz2"
+          output="screen"
+          args="-d $(find-pkg-share jetauto_simulation)/rviz_config/view2.rviz">
+        <param name="use_sim_time" value="false" />
+    </node>
+
+</launch>

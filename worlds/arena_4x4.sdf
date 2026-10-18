@@ -1,0 +1,213 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="arena_4x4">
+    <!-- Cài đặt vật lý cơ bản -->
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
+    <!-- Các plugin mặc định cần thiết của Gazebo Ignition/Sim -->
+    <plugin filename="ignition-gazebo-physics-system" name="ignition::gazebo::systems::Physics"></plugin>
+    <plugin filename="ignition-gazebo-user-commands-system" name="ignition::gazebo::systems::UserCommands"></plugin>
+    <plugin filename="ignition-gazebo-scene-broadcaster-system" name="ignition::gazebo::systems::SceneBroadcaster"></plugin>
+    <plugin filename="ignition-gazebo-sensors-system" name="ignition::gazebo::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+
+    <!-- Ánh sáng mặt trời -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Mặt đất -->
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>15 15</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+            </friction>
+          </surface>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>15 15</size>
+            </plane>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Tường rào tạo thành khu vực 4x4 mét (tọa độ +-2) -->
+    <!-- Tường phải (x = 2) -->
+    <model name="wall_right">
+      <static>true</static>
+      <pose>2 0 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.1 4.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.1 4.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Tường trái (x = -2) -->
+    <model name="wall_left">
+      <static>true</static>
+      <pose>-2 0 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>0.1 4.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>0.1 4.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Tường trên (y = 2) -->
+    <model name="wall_top">
+      <static>true</static>
+      <pose>0 2 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>4.1 0.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>4.1 0.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Tường dưới (y = -2) -->
+    <model name="wall_bottom">
+      <static>true</static>
+      <pose>0 -2 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>4.1 0.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>4.1 0.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.6 0.6 0.6 1</ambient>
+            <diffuse>0.6 0.6 0.6 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Bức tường phân cách 1 (Dài 1m, nằm giữa trục Y = 0) -->
+    <model name="wall_divider_1">
+      <static>true</static>
+      <pose>-1.5 0 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1.0 0.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1.0 0.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.8 0.8 0.4 1</ambient>
+            <diffuse>0.8 0.8 0.4 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Bức tường phân cách 2 (Dài 1m, nằm ở Y = 1) -->
+    <model name="wall_divider_2">
+      <static>true</static>
+      <pose>-1.5 1.0 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="collision"><geometry><box><size>1.0 0.1 0.5</size></box></geometry></collision>
+        <visual name="visual"><geometry><box><size>1.0 0.1 0.5</size></box></geometry>
+          <material>
+            <ambient>0.8 0.8 0.4 1</ambient>
+            <diffuse>0.8 0.8 0.4 1</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Thùng rác: Màu xanh da trời sáng -->
+    <!-- Đặt ở ô giữa 2 bức tường phân cách (Y = 0.5) -->
+    <model name="recycle_bin">
+      <static>true</static>
+      <pose>-1.6 0.5 0 0 0 0</pose>
+      <link name="link">
+        <!-- Đáy thùng -->
+        <collision name="base"><pose>0 0 0.005 0 0 0</pose><geometry><box><size>0.4 0.4 0.01</size></box></geometry></collision>
+        <visual name="base_v"><pose>0 0 0.005 0 0 0</pose><geometry><box><size>0.4 0.4 0.01</size></box></geometry>
+          <material><ambient>0.0 0.6 1.0 1</ambient><diffuse>0.0 0.6 1.0 1</diffuse></material></visual>
+        <!-- Tường trước -->
+        <collision name="wall_f"><pose>0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry></collision>
+        <visual name="wall_fv"><pose>0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry>
+          <material><ambient>0.0 0.6 1.0 1</ambient><diffuse>0.0 0.6 1.0 1</diffuse></material></visual>
+        <!-- Tường sau -->
+        <collision name="wall_b"><pose>-0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry></collision>
+        <visual name="wall_bv"><pose>-0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry>
+          <material><ambient>0.0 0.6 1.0 1</ambient><diffuse>0.0 0.6 1.0 1</diffuse></material></visual>
+        <!-- Tường trái -->
+        <collision name="wall_l"><pose>0 0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry></collision>
+        <visual name="wall_lv"><pose>0 0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry>
+          <material><ambient>0.0 0.6 1.0 1</ambient><diffuse>0.0 0.6 1.0 1</diffuse></material></visual>
+        <!-- Tường phải -->
+        <collision name="wall_r"><pose>0 -0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry></collision>
+        <visual name="wall_rv"><pose>0 -0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry>
+          <material><ambient>0.0 0.6 1.0 1</ambient><diffuse>0.0 0.6 1.0 1</diffuse></material></visual>
+      </link>
+    </model>
+
+    <!-- Thùng rác: Màu xanh lá cây (Tái chế) -->
+    <!-- Đặt ở ô ngoài cùng bên tay phải (Y = 1.5) -->
+    <model name="recycle_bin_green">
+      <static>true</static>
+      <pose>-1.6 1.5 0 0 0 0</pose>
+      <link name="link">
+        <!-- Đáy thùng -->
+        <collision name="base"><pose>0 0 0.005 0 0 0</pose><geometry><box><size>0.4 0.4 0.01</size></box></geometry></collision>
+        <visual name="base_v"><pose>0 0 0.005 0 0 0</pose><geometry><box><size>0.4 0.4 0.01</size></box></geometry>
+          <material><ambient>0.0 0.8 0.0 1</ambient><diffuse>0.0 0.8 0.0 1</diffuse></material></visual>
+        <!-- Tường trước -->
+        <collision name="wall_f"><pose>0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry></collision>
+        <visual name="wall_fv"><pose>0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry>
+          <material><ambient>0.0 0.8 0.0 1</ambient><diffuse>0.0 0.8 0.0 1</diffuse></material></visual>
+        <!-- Tường sau -->
+        <collision name="wall_b"><pose>-0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry></collision>
+        <visual name="wall_bv"><pose>-0.19 0 0.075 0 0 0</pose><geometry><box><size>0.02 0.4 0.15</size></box></geometry>
+          <material><ambient>0.0 0.8 0.0 1</ambient><diffuse>0.0 0.8 0.0 1</diffuse></material></visual>
+        <!-- Tường trái -->
+        <collision name="wall_l"><pose>0 0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry></collision>
+        <visual name="wall_lv"><pose>0 0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry>
+          <material><ambient>0.0 0.8 0.0 1</ambient><diffuse>0.0 0.8 0.0 1</diffuse></material></visual>
+        <!-- Tường phải -->
+        <collision name="wall_r"><pose>0 -0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry></collision>
+        <visual name="wall_rv"><pose>0 -0.19 0.075 0 0 0</pose><geometry><box><size>0.4 0.02 0.15</size></box></geometry>
+          <material><ambient>0.0 0.8 0.0 1</ambient><diffuse>0.0 0.8 0.0 1</diffuse></material></visual>
+      </link>
+    </model>
+
+  </world>
+</sdf>

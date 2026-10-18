@@ -1,0 +1,82 @@
+<launch>
+    <!-- Khai báo đường dẫn urdf ra riêng để tiện debug -->
+    <let name="urdf_path" value="$(find-pkg-share jetauto_simulation)/urdf/jetauto.xacro" />
+
+    <!-- 
+      Chạy robot_state_publisher với xacro của jetauto.
+      Để xacro tải cấu hình CÓ CÁNH TAY, ta cần truyền biến môi trường MACHINE_TYPE=JetAutoPro.
+      Ta sử dụng lệnh 'env' để gán biến môi trường ngay trước lệnh xacro.
+    -->
+    <set_env name="need_compile" value="True" />
+    
+    <!-- Cung cấp đường dẫn cho Gazebo Ignition để nó có thể tìm thấy các file mesh (STL/DAE) -->
+    <!-- Gazebo sẽ chuyển đổi 'package://jetauto_simulation' thành 'model://jetauto_simulation' -->
+    <set_env name="IGN_GAZEBO_RESOURCE_PATH" value="$(find-pkg-share jetauto_simulation)/.." />
+    <set_env name="GZ_SIM_RESOURCE_PATH" value="$(find-pkg-share jetauto_simulation)/.." />
+
+    <!-- Chạy script scale physics tự động để fix lỗi vật lý cánh tay -->
+    
+
+    <node pkg="robot_state_publisher" exec="robot_state_publisher" name="robot_state_publisher" output="screen">
+        <param name="robot_description" 
+               value="$(command 'env need_compile=True MACHINE_TYPE=JetAutoPro LIDAR_TYPE=A1 DEPTH_CAMERA_TYPE=AstraPro xacro $(var urdf_path)')" />
+        <param name="use_sim_time" value="true" />
+    </node>
+
+    <!-- joint_state_publisher: đọc dữ liệu khớp từ Gazebo (/gz_joint_states),
+         tự điền giá trị mặc định cho các khớp Gazebo không cung cấp,
+         rồi publish tổng hợp lên /joint_states cho robot_state_publisher -->
+    <node pkg="joint_state_publisher" exec="joint_state_publisher" name="joint_state_publisher" output="screen">
+        <param name="robot_description" 
+               value="$(command 'env need_compile=True MACHINE_TYPE=JetAutoPro LIDAR_TYPE=A1 DEPTH_CAMERA_TYPE=AstraPro xacro $(var urdf_path)')" />
+        <param name="use_sim_time" value="true" />
+        <param name="source_list" value="[/gz_joint_states]" />
+        <param name="rate" value="50" />
+    </node>
+
+    <!-- Node publish liên tục trạng thái để bẻ khớp 1, 2, 3, 4 góc 90 độ (1.57 rad) trong Gazebo -->
+    <!-- <executable cmd="ros2 topic pub -r 10 /arm/joint1/cmd_pos std_msgs/msg/Float64 '{data: 0.0}'" output="log" />
+    <executable cmd="ros2 topic pub -r 10 /arm/joint2/cmd_pos std_msgs/msg/Float64 '{data: 0.0}'" output="log" />
+    <executable cmd="ros2 topic pub -r 10 /arm/joint3/cmd_pos std_msgs/msg/Float64 '{data: 0.0}'" output="log" />
+    <executable cmd="ros2 topic pub -r 10 /arm/joint4/cmd_pos std_msgs/msg/Float64 '{data: 0.0}'" output="log" /> -->
+
+    <!-- Khởi chạy Gazebo Ignition (ros_gz_sim) với arena_4x4 world -->
+    <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+        <arg name="gz_args" value="-r $(find-pkg-share jetauto_simulation)/worlds/arena_maze_6x4.sdf" />
+    </include>
+
+    <!-- Spawn robot vào trong Gazebo (tuỳ chọn, nhưng cần thiết để thấy robot trong Gazebo) -->
+    <node pkg="ros_gz_sim" exec="create" name="spawn_entity" output="screen"
+          args="-name jetauto -topic robot_description -x 2.0 -y -1.5 -z 0.05 -Y 1.5708" />
+
+    <!-- Bridge ROS 2 và Gazebo Ignition -->
+    <node pkg="ros_gz_bridge" exec="parameter_bridge" name="ros_gz_bridge" output="screen">
+        <param name="config_file" value="$(find-pkg-share jetauto_simulation)/bridge_config/ros_gz_bridge.yaml" />
+    </node>
+
+    <!-- ================================================ -->
+    <!-- EKF Node (Trộn Odom + IMU)                       -->
+    <!-- ================================================ -->
+    <node pkg="robot_localization" exec="ekf_node" name="ekf_filter_node">
+        <param from="$(find-pkg-share jetauto_simulation)/params/ekf.yaml" />
+        <remap from="odometry/filtered" to="odom_filtered"/>
+    </node>
+
+    <!-- ================================================ -->
+    <!-- Navigation2 Stack (Đọc map, AMCL, Planner, v.v.) -->
+    <!-- ================================================ -->
+    <include file="$(find-pkg-share nav2_bringup)/launch/bringup_launch.py">
+        <arg name="map" value="$(find-pkg-share jetauto_simulation)/map/map5.yaml" />
+        <arg name="params_file" value="$(find-pkg-share jetauto_simulation)/params/nav2_params.yaml" />
+        <arg name="use_sim_time" value="True" />
+        <arg name="autostart" value="True" />
+        <arg name="slam" value="False" />
+    </include>
+
+    <!-- Khởi chạy RViz -->
+    <node pkg="rviz2" exec="rviz2" name="rviz2" output="screen"
+          args="-d $(find-pkg-share jetauto_simulation)/rviz_config/view.rviz">
+        <param name="use_sim_time" value="true" />
+    </node>
+
+</launch>
