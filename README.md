@@ -126,4 +126,5 @@ jetauto_simulation/
 
 ## Video Demo
 
-*Bổ sung video mô phỏng và video chạy trên robot thật tại đây.*
+https://youtube.com/shorts/KxRJGK9Ayho
+
