@@ -126,5 +126,5 @@ jetauto_simulation/
 
 ## Video Demo
 
-https://youtube.com/shorts/KxRJGK9Ayho
+[![JetAuto Pro - Transport Navigation Demo](https://img.youtube.com/vi/KxRJGK9Ayho/0.jpg)](https://www.youtube.com/shorts/KxRJGK9Ayho)
 
